@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  nodeapp:
+    image: node:12-alpine
+    command: sh -c "yarn install && yarn run dev"
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 8080:3000
+    working_dir: /nodeapp
+    volumes:
+      - ./:/nodeapp
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: todos
+    networks:
+    - nodeapp
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment: 
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: todos
+    networks:
+    - nodeapp
+
+volumes:
+  mysql-data:
+
+networks:
+  nodeapp:
